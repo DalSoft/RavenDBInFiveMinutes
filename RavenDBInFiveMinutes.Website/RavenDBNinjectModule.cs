@@ -20,7 +20,16 @@ namespace RavenDBInFiveMinutes.Website
            })
            .InSingletonScope();
 
-            Bind<IDocumentSession>().ToMethod(context => context.Kernel.Get<IDocumentStore>().OpenSession()).InRequestScope();
+            Bind<IDocumentSession>().ToMethod(context => context.Kernel.Get<IDocumentStore>().OpenSession())
+                .InRequestScope()
+                .OnDeactivation(x =>
+                {
+                    if (x == null)
+                        return;
+
+                    x.SaveChanges();
+                    x.Dispose();
+                });
         }
     }
 }

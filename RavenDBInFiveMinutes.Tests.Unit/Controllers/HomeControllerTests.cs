@@ -29,16 +29,7 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
             var result = (ViewResult)homeController.List(null);
             Assert.That(result.ViewName, Is.Empty);
         }
-
-        [Test(Description = "GET: /Home/")]
-        public void ListAction_SuppliedMessage_MessageIsAddedToViewBag()
-        {
-            const string message = "Test Messaage";
-            var homeController = new HomeController(_documentSession);
-            var result = (ViewResult)homeController.List(message);
-            Assert.That(result.ViewBag.Message, Is.EqualTo(message));
-        }
-
+        
         [Test(Description = "GET: /Home/")]
         public void ListAction_SuppliedNullMessage_MessageIsAddedToViewBagNoErrorIsThrown()
         {
@@ -86,8 +77,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         public void DetailsAction_IdNotFound_RedirectsToIndexActionSettingMessage()
         {
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.Details(0);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
+            homeController.Details(0);
+            Assert.That(homeController.TempData["message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
         }
 
 
@@ -121,8 +112,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         {
             var movie = new Movie().NewValid();
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.Create(movie);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Created Movie {0}", movie.Title)));
+            homeController.Create(movie);
+            Assert.That(homeController.TempData["message"], Is.EqualTo(string.Format("Created Movie {0}", movie.Title)));
         }
 
         [Test(Description = "GET: /Home/Edit/5")]
@@ -155,8 +146,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         public void EditAction_IdNotFound_RedirectsToIndexActionSettingMessage()
         {
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.Edit(0);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
+            homeController.Edit(0);
+            Assert.That(homeController.TempData["message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
         }
 
         [Test(Description = "POST: /Home/Edit")]
@@ -181,8 +172,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         {
             var movie = _documentSession.SaveNewMovieToRavenDB(new Movie().NewValid());
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.Edit(movie);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Saved changes to Movie {0}", movie.Title)));
+            homeController.Edit(movie);
+            Assert.That(homeController.TempData["message"], Is.EqualTo(string.Format("Saved changes to Movie {0}", movie.Title)));
         }
         
         [Test(Description = "GET: /Home/Delete/5")]
@@ -215,8 +206,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         public void ConfirmDeleteAction_IdNotFound_RedirectsToIndexActionSettingMessage()
         {
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.ConfirmDelete(0);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
+            homeController.ConfirmDelete(0);
+            Assert.That(homeController.TempData["Message"], Is.EqualTo(string.Format("Movie {0} not found", 0)));
         }
 
         [Test(Description = "POST: /Home/Delete")]
@@ -233,8 +224,8 @@ namespace RavenDBInFiveMinutes.Tests.Unit.Controllers
         {
             var movie = _documentSession.SaveNewMovieToRavenDB(new Movie().NewValid());
             var homeController = new HomeController(_documentSession);
-            var result = (RedirectToRouteResult)homeController.Delete(movie.Id);
-            Assert.That(result.RouteValues["message"], Is.EqualTo(string.Format("Deleted Movie with the Id {0}", movie.Id)));
+            homeController.Delete(movie.Id);
+            Assert.That(homeController.TempData["message"], Is.EqualTo(string.Format("Deleted Movie with the Id {0}", movie.Id)));
         }
 
 

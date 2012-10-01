@@ -22,8 +22,6 @@ namespace RavenDBInFiveMinutes.Website.Controllers
                 .Customize(x=>x.WaitForNonStaleResults())
                 .Take(50).ToList(); //TODO paging :)
 
-            ViewBag.Message = message;
-
             return View(movies);
         }
 
@@ -32,9 +30,12 @@ namespace RavenDBInFiveMinutes.Website.Controllers
         {
             var movie = _documentSession.Load<Movie>(id);
 
-            if (movie==null)
-                return RedirectToAction("Index", new { message = string.Format("Movie {0} not found", id) });
-
+            if (movie == null)
+            {
+                TempData["Message"] = string.Format("Movie {0} not found", id);
+                return RedirectToAction("Index");
+            }
+            
             return View(movie);
         }
 
@@ -52,9 +53,10 @@ namespace RavenDBInFiveMinutes.Website.Controllers
                 return View();
 
             _documentSession.Store(movie);
-            _documentSession.SaveChanges();
 
-            return RedirectToAction("Index", new { message = string.Format("Created Movie {0}", movie.Title) });
+            TempData["Message"] = string.Format("Created Movie {0}", movie.Title);
+
+            return RedirectToAction("Index");
         }
         
         // GET: /Home/Edit/5 
@@ -63,7 +65,10 @@ namespace RavenDBInFiveMinutes.Website.Controllers
             var movie = _documentSession.Load<Movie>(id);
 
             if (movie == null)
-                return RedirectToAction("Index", new { message = string.Format("Movie {0} not found", id) });
+            {
+                TempData["Message"] = string.Format("Movie {0} not found", id);
+                return RedirectToAction("Index");
+            }
 
             return View(movie);
         }
@@ -76,9 +81,9 @@ namespace RavenDBInFiveMinutes.Website.Controllers
                 return View();
             
             _documentSession.Store(movie);
-            _documentSession.SaveChanges();
+            TempData["Message"] = string.Format("Saved changes to Movie {0}", movie.Title);
 
-            return RedirectToAction("Index", new { message = string.Format("Saved changes to Movie {0}", movie.Title) });
+            return RedirectToAction("Index");
         }
 
         // GET: /Home/Delete/5
@@ -88,7 +93,10 @@ namespace RavenDBInFiveMinutes.Website.Controllers
             var movie = _documentSession.Load<Movie>(id);
 
             if (movie == null)
-                return RedirectToAction("Index", new { message = string.Format("Movie {0} not found", id) });
+            {
+                TempData["Message"] = string.Format("Movie {0} not found", id);
+                return RedirectToAction("Index");
+            }
             
             return View(movie);
         }
@@ -98,9 +106,9 @@ namespace RavenDBInFiveMinutes.Website.Controllers
         public ActionResult Delete(int id)
         {
             _documentSession.Delete(_documentSession.Load<Movie>(id));
-            _documentSession.SaveChanges();
+            TempData["Message"] = string.Format("Deleted Movie with the Id {0}", id);
 
-            return RedirectToAction("Index", new { message = string.Format("Deleted Movie with the Id {0}", id) });
+            return RedirectToAction("Index");
         }
     }
 }
